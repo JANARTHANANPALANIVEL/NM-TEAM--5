@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+
+// Define GPIO pins for sensor 1 and sensor 2
+#define SENSOR1_PIN GPIO_NUM_12
+#define SENSOR2_PIN GPIO_NUM_14
+
+void parkingTask(void *pvParameters) {
+    int parkingSpot1 = 0; // 0 means empty, 1 means occupied
+    int parkingSpot2 = 0;
+
+    while (1) {
+        // Read the sensor values
+        int sensor1_value = gpio_get_level(SENSOR1_PIN);
+        int sensor2_value = gpio_get_level(SENSOR2_PIN);
+
+        // Check if parking spot 1 is occupied
+        if (sensor1_value == 1) {
+            parkingSpot1 = 1;
+        } else {
+            parkingSpot1 = 0;
+        }
+
+        // Check if parking spot 2 is occupied
+        if (sensor2_value == 1) {
+            parkingSpot2 = 1;
+        } else {
+            parkingSpot2 = 0;
+        }
+
+        // Display the parking status
+        printf("Parking Spot 1: %s\n", parkingSpot1 ? "Occupied" : "Empty");
+        printf("Parking Spot 2: %s\n", parkingSpot2 ? "Occupied" : "Empty");
+
+        vTaskDelay(pdMS_TO_TICKS(1000)); // Check every 1 second
+    }
+}
+
+void app_main() {
+    // Initialize GPIO pins for the sensors
+    gpio_pad_select_gpio(SENSOR1_PIN);
+    gpio_set_direction(SENSOR1_PIN, GPIO_MODE_INPUT);
+
+    gpio_pad_select_gpio(SENSOR2_PIN);
+    gpio_set_direction(SENSOR2_PIN, GPIO_MODE_INPUT);
+
+    // Create a task to monitor parking status
+    xTaskCreate(&parkingTask, "parking_task", 2048, NULL, 5, NULL);
+}
