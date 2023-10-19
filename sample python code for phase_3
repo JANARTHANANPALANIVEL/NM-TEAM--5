@@ -1,0 +1,48 @@
+
+import random
+import time
+# Simulated parking space occupancy data
+parking_spaces = {
+    "Space1": False,
+    "Space2": False,
+    "Space3": False,
+    "Space4": False,
+}
+
+# Function to update parking space occupancy
+def update_parking_space():
+    for space in parking_spaces:
+        if random.random() < 0.7:
+            parking_spaces[space] = True
+        else:
+            parking_spaces[space] = False
+
+# Function to check parking space availability
+def check_parking_availability(space):
+    return "Occupied" if parking_spaces[space] else "Available"
+
+# Simulated mobile app
+while True:
+    print("Mobile App - Parking Availability:")
+    for space in parking_spaces:
+        availability = check_parking_availability(space)
+        print(f"{space}: {availability}")
+    print("\n")
+    time.sleep(5)  # Simulating real-time updates
+
+# Simulated signage
+while True:
+    print("Digital Signage - Parking Availability:")
+    for space in parking_spaces:
+        availability = check_parking_availability(space)
+        print(f"{space}: {availability}")
+    print("\n")
+    time.sleep(10)  # Simulating real-time updates
+
+# Simulated parking optimization (reservation system)
+while True:
+    for space in parking_spaces:
+        if not parking_spaces[space]:
+            print(f"Reserve {space} for a user")
+            parking_spaces[space] = True
+            time.sleep(3600)  # Simulating a 1-hour reservation
