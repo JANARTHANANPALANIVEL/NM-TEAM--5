@@ -1,0 +1,43 @@
+import cv2
+import tkinter as tk
+from tkinter import Label, Button
+
+# Function to toggle parking space occupancy
+def toggle_occupancy(space_id):
+    global parking_lot
+    parking_lot[space_id] = not parking_lot[space_id]
+    update_display()
+
+# Function to update the parking lot display
+def update_display():
+    for space_id, status in enumerate(parking_lot):
+        if status:
+            labels[space_id].config(text=f"Space {space_id + 1}: Occupied", bg='red')
+        else:
+            labels[space_id].config(text=f"Space {space_id + 1}: Available", bg='green')
+
+# Create an initial parking lot configuration
+num_spaces = 10
+parking_lot = [False] * num_spaces
+
+# Create a GUI window
+root = tk.Tk()
+root.title("Smart Parking System")
+
+# Create labels and buttons for parking spaces
+labels = []
+for i in range(num_spaces):
+    label = Label(root, text=f"Space {i + 1}: Available", bg='green')
+    label.pack()
+    labels.append(label)
+
+# Create a button to update parking space occupancy
+occupy_button = Button(root, text="Toggle Space Occupancy", command=lambda: toggle_occupancy(0))
+occupy_button.pack()
+
+# Create a button to update the parking lot display
+update_button = Button(root, text="Update Display", command=update_display)
+update_button.pack()
+
+# Start the GUI main loop
+root.mainloop()
