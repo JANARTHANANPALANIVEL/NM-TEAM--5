@@ -1,0 +1,257 @@
+/*
+* #_author: Sagar Mukherjee
+* #_aliasc: it sends the data to http://smartparkingrcc.000webhostapp.com/write_data.php?value=3000
+* it will send the data in every 30 sec
+*/
+//#define sensor D0
+#include <ESP8266WiFi.h>
+// The WiFi station (receiver) credentials
+// Router credentials
+const char* ssid = "Red4Ever";//"bumtum";
+const char* password = "8697602718";//"123456789";
+const char* host = "smartparkingrcc.000webhostapp.com";
+const int httpPort = 80;
+int s1=0,s2=0,s3=0,s4=0,s5=0,s6=0;//unsigned long
+int Obstacle1=1,Obstacle2=1,Obstacle3=1,Obstacle4=1,Obstacle5=1,Obstacle6=1;
+// Declare and define a function for sending data
+void broadcast(void) {
+WiFiClient client;
+if (!client.connect(host, httpPort)) {
+Serial.println("\t[E] Server connection failed");
+Serial.println("\t[E] Please check if the listening daemon is up");
+return;
+}
+// Needs manipulation for data sending
+// Generating the server GET request
+String url = "/write_data.php?";
+url += "s1=";
+url += s1;
+url +="&";
+url += "s2=";
+url += s2;
+url +="&";
+url += "s3=";
+url += s3;
+url +="&";
+url += "s4=";
+url += s4;
+url +="&";
+url += "s5=";
+url += s5;
+url +="&";
+url += "s6=";
+url += s6;
+Serial.println(url);
+client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+"Host: " + host + "\r\n" +
+"Connection: close\r\n\r\n");
+unsigned int timeout = millis();
+while(client.available() == 0) {
+if(millis() - timeout > 6000) {
+Serial.println("\t[E] Server connection timed out");
+Serial.println("\t[E] Server failed to response");
+return;
+}
+}
+Serial.println("[X] Current batch of data has been sent and buffer flushed");
+}
+/*void var_init_t(void) {
+s1timeup = 0;
+s2timeup = 0;
+}*/
+void setup() {
+// Setting pins D0, D1, D2 for inputs using pullup resistor
+pinMode(D0, INPUT_PULLUP);
+pinMode(D1, INPUT_PULLUP);
+pinMode(D2, INPUT_PULLUP);
+pinMode(D3, INPUT_PULLUP);
+pinMode(D4, INPUT_PULLUP);
+pinMode(D5, INPUT_PULLUP);
+/* pinMode(D1, INPUT_PULLUP);
+pinMode(D2, INPUT_PULLUP);
+*/
+// Initialize the serial port for debugging and testing
+Serial.begin(115200);
+// WiFi setup routine
+Serial.println("\n[X] Connecting to WiFi station");
+Serial.print("\t[X] Attempting to connect to WiFi\n\t");
+WiFi.begin(ssid, password);
+while(WiFi.status() != WL_CONNECTED) {
+delay(500);
+Serial.print(".");
+}
+//var_init_t();
+Serial.println("[X] Connected to WiFi");
+Serial.println("[X] IP Addr: " + WiFi.localIP());
+Serial.println("[X] Node setup complete...");
+}
+//THE LOGIC PART
+void loop() {
+// static int count =0;
+if(WiFi.status() != WL_CONNECTED) {
+setup();
+return;
+} else {
+//pin mapping nos d0-16 ,d1-5 ,d2-4 ,d3-0 ,d4-2 ,d5- 14.
+//S1
+Obstacle1 = digitalRead(D0);
+if (Obstacle1 == LOW)
+{
+Serial.println("OBSTACLE!!, OBSTACLE!!");
+s1=1;
+}
+else
+{
+Serial.println("clear");
+s1=0;
+}
+//S2
+Obstacle2 = digitalRead(D1);
+if (Obstacle2 == LOW)
+{
+Serial.println("OBSTACLE!!, OBSTACLE!!");
+s2=1;
+}
+else
+{
+Serial.println("clear");
+s2=0;
+}
+//S3
+Obstacle3 = digitalRead(D2);
+if (Obstacle3 == LOW)
+{
+Serial.println("OBSTACLE!!, OBSTACLE!!");
+s3=1;
+}
+else
+{
+Serial.println("clear");
+s3=0;
+}
+//S4
+Obstacle4 = digitalRead(D3);
+if (Obstacle4 == LOW)
+{
+Serial.println("OBSTACLE!!, OBSTACLE!!");
+s4=1;
+}
+else
+{
+Serial.println("clear");
+s4=0;
+}
+//S5
+Obstacle5 = digitalRead(D4);
+if (Obstacle5 == LOW)
+{
+Serial.println("OBSTACLE!!, OBSTACLE!!");
+s5=1;
+}
+else
+{
+Serial.println("clear");
+s5=0;
+}
+//S6
+Obstacle6 = digitalRead(D5);
+if (Obstacle6 == LOW)
+{
+Serial.println("OBSTACLE!!, OBSTACLE!!");
+s6=1;
+}
+else
+{
+Serial.println("clear");
+s6=0;
+}
+/* //S1
+float volts1 = analogRead(A0)*0.0048828125; // value from sensor * (5/1024)
+int distance1 = 13*pow(volts1, -1); // worked out from datasheet graph
+delay(500); // slow down serial port
+Serial.println(distance1);
+if (distance1 < 50){
+s1=1;
+}
+else{
+s1=0;
+}
+//S2
+float volts2 = analogRead(D1)*0.0048828125; // value from sensor * (5/1024)
+int distance2 = 13*pow(volts2, -1); // worked out from datasheet graph
+delay(500); // slow down serial port
+Serial.println(distance2);
+if (distance2 < 50){
+s2=1;
+}
+else{
+s2=0;
+}
+//S3
+float volts3 = analogRead(D2)*0.0048828125; // value from sensor * (5/1024)
+int distance3 = 13*pow(volts3, -1); // worked out from datasheet graph
+delay(500); // slow down serial port
+Serial.println(distance3);
+if (distance3 < 50){
+s3=1;
+}
+else{
+s3=0;
+}
+//S4
+float volts4 = analogRead(D3)*0.0048828125; // value from sensor * (5/1024)
+int distance4 = 13*pow(volts4, -1); // worked out from datasheet graph
+delay(500); // slow down serial port
+Serial.println(distance4);
+if (distance4 < 50){
+s4=1;
+}
+else{
+s4=0;
+}
+//S5
+float volts5 = analogRead(D4)*0.0048828125; // value from sensor * (5/1024)
+int distance5 = 13*pow(volts5, -1); // worked out from datasheet graph
+delay(500); // slow down serial port
+Serial.println(distance5);
+if (distance5 < 50){
+s5=1;
+}
+else{
+s5=0;
+}
+//S6
+float volts6 = analogRead(D5)*0.0048828125; // value from sensor * (5/1024)
+int distance6 = 13*pow(volts6, -1); // worked out from datasheet graph
+delay(500); // slow down serial port
+Serial.println(distance6);
+if (distance6 < 50){
+s6=1;
+}
+else{
+s6=0;
+}
+*/
+delay(1000);
+/*
+Serial.print("connecting to ");
+Serial.println(host);
+// Use WiFiClient class to create TCP connections
+WiFiClient client;
+const int httpPort = 80;
+if (!client.connect(host, httpPort)) {
+Serial.println("connection failed");
+return;
+}*/
+/*
+int s1 = digitalRead(D0);
+int s2 = digitalRead(D1);
+int s3 = digitalRead(D2);
+int s4 = digitalRead(D3);
+int s5 = digitalRead(D4);
+int s6 = digitalRead(D5);
+*/
+broadcast();
+}
+delay(500);
+}
